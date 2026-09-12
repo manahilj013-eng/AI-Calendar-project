@@ -1,0 +1,200 @@
+/* ==========================================================================
+   SMARTTIME AI — ANIMATIONS & MICRO-INTERACTIONS
+   ========================================================================== */
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--primary-purple-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(108, 99, 255, 0);
+  }
+}
+
+@keyframes pulseMic {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(248, 165, 194, 0.6);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 18px rgba(248, 165, 194, 0);
+  }
+}
+
+/* Laser Scanner Bar for Image OCR Preview */
+@keyframes laserScan {
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 96%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.8;
+  }
+}
+
+.scanner-box {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--soft-purple);
+  background: var(--bg-soft-purple);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.scanner-laser {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #6C63FF, #5BC0EB, #6EE7B7, transparent);
+  box-shadow: 0 0 15px 3px #6C63FF, 0 0 30px 6px #5BC0EB;
+  z-index: 10;
+  animation: laserScan 2.2s ease-in-out infinite;
+}
+
+/* Audio Wave Visualizer for Voice Input */
+.audio-waves {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 48px;
+  margin: 1.2rem 0;
+}
+
+.audio-bar {
+  width: 6px;
+  background: linear-gradient(180deg, var(--soft-pink), var(--primary-purple));
+  border-radius: var(--radius-full);
+  animation: soundWave 1.2s ease-in-out infinite alternate;
+}
+
+.audio-bar:nth-child(1) { height: 16px; animation-delay: 0.1s; }
+.audio-bar:nth-child(2) { height: 32px; animation-delay: 0.3s; }
+.audio-bar:nth-child(3) { height: 48px; animation-delay: 0.2s; }
+.audio-bar:nth-child(4) { height: 28px; animation-delay: 0.4s; }
+.audio-bar:nth-child(5) { height: 42px; animation-delay: 0.15s; }
+.audio-bar:nth-child(6) { height: 20px; animation-delay: 0.35s; }
+.audio-bar:nth-child(7) { height: 38px; animation-delay: 0.25s; }
+
+@keyframes soundWave {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+/* Animated Progress Checklist Items */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-normal);
+}
+
+.check-item.done {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.check-item-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  background: var(--border-color);
+  color: white;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.check-item.done .check-item-icon {
+  background: var(--status-success);
+  transform: scale(1.1);
+}
+
+.check-item.loading .check-item-icon {
+  background: var(--primary-purple);
+  animation: pulseGlow 1.5s infinite;
+}
+
+/* Confetti Pop Animation for Step 5 Success */
+@keyframes popSuccess {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success-pop-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--mint-green), #22C55E);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 10px 28px rgba(34, 197, 94, 0.35);
+  animation: popSuccess 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Alarm Bell Pulsing Ring Keyframe */
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 101, 132, 0.7);
+  }
+  70% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 24px rgba(255, 101, 132, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 101, 132, 0);
+  }
+}
+
+/* BounceIn Animation */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03) translateY(-4px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+

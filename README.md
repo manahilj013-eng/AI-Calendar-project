@@ -1,19 +1,24 @@
-# 📁 AI Calendar Project — Full Source Code & Application Folder
+# 📁 SMARTTIME AI — Live Web Application & Full Project Codebase
 
-> 🌟 **Project Status: FULL FOLDER 100% UPLOADED & SAVED**
->
-> Aapka pura project folder (saare codes, frontend, backend, database, aur UI files) is repository mein safely upload ho chuka hai!
->
-> ### 📂 Project File & Directory Browser:
-> Page ke upar aapko project ke saare folders nazar aayenge:
-> - 📁 **`public/`** — Frontend Web Application (HTML, CSS, JavaScript, Calendar Views, Wizards)
-> - 📁 **`server/`** — Backend Server (Node.js/Express, AI Parser, Recurrence Engine, API routes)
-> - 📁 **`data/`** — Database Storage (`smarttime.json`)
-> - 📁 **`tests/`** — Automated Test Suites
-> - 📁 **`uploads/`** — Timetable Uploads & Assets
-> - 📦 **`AI-Calendar-Project-Complete-Folder.zip`** — Pura project folder ek click mein download karne ke liye
->
-> 💡 **Pure folder ko download karne ke liye:** Page ke top par green button **`Code`** par click karke **`Download ZIP`** select karein.
+> 🌐 **LIVE WEB APP LINK (GitHub Pages):**
+> ### 👉 **[https://manahilj013-eng.github.io/AI-Calendar-project/](https://manahilj013-eng.github.io/AI-Calendar-project/)**
+> 
+> 🚀 **Pura project is link par live chal raha hai!** Click karke aap pura calendar app, timetable scanner, dashboard, CSV auto-generator aur alarms browser mein chala sakte hain!
+
+---
+
+### 📂 Repository File & Directory Structure:
+Page ke upar aapko project ke saare folders aur files nazar aayengi:
+- 🌐 **`index.html`** — Main Web Application Entry Point (Live on GitHub Pages)
+- 📁 **`css/`** & **`public/css/`** — Design System, Responsive Styles, Dark Mode & Animations
+- 📁 **`js/`** & **`public/js/`** — Complete Frontend Logic, AI Wizards, Calendar Views & CSV Engine
+- 📁 **`server/`** — Backend Server (Node.js/Express, AI Parser, Recurrence Engine, API routes)
+- 📁 **`data/`** — Database Storage (`smarttime.json`)
+- 📁 **`tests/`** — Automated Test Suites (27/27 Passing)
+- 📁 **`uploads/`** — Timetable Uploads & Assets
+- 📦 **`AI-Calendar-Project-Complete-Folder.zip`** — Pura project folder ek click mein download karne ke liye
+
+💡 **Pure folder ko download karne ke liye:** Page ke top par green button **`Code`** par click karke **`Download ZIP`** select karein.
 
 ---
 

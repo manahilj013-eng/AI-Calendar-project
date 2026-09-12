@@ -604,6 +604,17 @@
       "avatar": null,
       "created_at": "2026-09-12T08:33:18.73+00:00",
       "updated_at": "2026-09-12T08:33:18.73+00:00"
+    },
+    {
+      "id": "usr_d99071bb-933c-40a7-924e-4b64db905b57",
+      "name": "Test Student",
+      "email": "test_1789219218117@smarttime.ai",
+      "password_hash": "365280cb9f844e36bf6f2015805f10f84801ad796c3d4d19f247f4aefd0b406f",
+      "role": "Student",
+      "timezone": "UTC",
+      "avatar": null,
+      "created_at": "2026-09-12T13:20:18.119+00:00",
+      "updated_at": "2026-09-12T13:20:18.12+00:00"
     }
   ],
   "timetables": [
@@ -1130,6 +1141,42 @@
       "duration": "3 Months"
     },
     {
+      "id": "tt_3b760ded-6486-48b5-9b08-98a5ae57f29b",
+      "user_id": "usr_d99071bb-933c-40a7-924e-4b64db905b57",
+      "title": null,
+      "semester": null,
+      "source_type": "manual",
+      "validity_period": "3_months",
+      "start_date": "2026-08-30",
+      "end_date": "2027-03-02",
+      "is_active": true,
+      "status": "active",
+      "raw_schedule_json": null,
+      "created_at": "2026-09-12T13:20:18.132+00:00",
+      "updated_at": "2026-09-12T13:20:18.132+00:00",
+      "name": "Semester 1 Routine",
+      "image_url": null,
+      "duration": "3 Months"
+    },
+    {
+      "id": "tt_e08123d5-ccd9-4345-929b-4cf297e56b70",
+      "user_id": "usr_e05d9930-d223-482e-b432-5822236858cd",
+      "title": null,
+      "semester": null,
+      "source_type": "manual",
+      "validity_period": "3_months",
+      "start_date": "2026-08-30",
+      "end_date": "2027-03-02",
+      "is_active": true,
+      "status": "active",
+      "raw_schedule_json": null,
+      "created_at": "2026-09-12T19:57:14.094+00:00",
+      "updated_at": "2026-09-12T19:57:14.094+00:00",
+      "name": "Semester 1 Routine",
+      "image_url": null,
+      "duration": "3 Months"
+    },
+    {
       "id": "tt_93e1ff74-9ee8-4b8e-8372-ff1045b347ff",
       "user_id": "usr_d6b52463-2b78-4a3d-a270-a7ee0ea0c84d",
       "title": null,
@@ -1257,6 +1304,32 @@
     }
   ],
   "events": [
+    {
+      "id": "evt_db8df33f-7bf0-496b-984f-15fa966c53c2",
+      "user_id": "usr_e05d9930-d223-482e-b432-5822236858cd",
+      "timetable_id": "tt_e08123d5-ccd9-4345-929b-4cf297e56b70",
+      "class_name": "Data Structures",
+      "day_of_week": null,
+      "start_time": "14:00",
+      "end_time": "15:30",
+      "duration_minutes": 60,
+      "room": null,
+      "teacher": null,
+      "color": "#6366f1",
+      "confidence": 1,
+      "is_rescheduled": false,
+      "original_time": null,
+      "status": "active",
+      "created_at": "2026-09-12T19:57:14.1+00:00",
+      "updated_at": "2026-09-12T19:57:14.1+00:00",
+      "subject": null,
+      "day": "Monday",
+      "date": null,
+      "duration": 90,
+      "location": null,
+      "notes": null,
+      "recurrence_rule": null
+    },
     {
       "id": "evt_2c001b35-e0b4-4ae2-8cd1-6467c963d45b",
       "user_id": "usr_24441706-b699-459e-9280-bd16f04f0efa",
@@ -2961,6 +3034,20 @@
       "notification_type": "browser",
       "status": "pending",
       "created_at": "2026-09-11T19:36:15.798+00:00",
+      "sent_at": null
+    },
+    {
+      "id": "rem_2d726e5f-784b-4fcd-a8fb-15ef2cd33418",
+      "user_id": "usr_e05d9930-d223-482e-b432-5822236858cd",
+      "event_id": "evt_db8df33f-7bf0-496b-984f-15fa966c53c2",
+      "timetable_id": "tt_e08123d5-ccd9-4345-929b-4cf297e56b70",
+      "occurrence_date": "2026-10-12",
+      "reminder_minutes_before": 5,
+      "scheduled_time": "2026-10-12T08:55:00+00:00",
+      "message": "Reminder: Your Data Structures class starts in 5 minutes.",
+      "notification_type": "browser",
+      "status": "pending",
+      "created_at": "2026-09-12T19:57:14.162+00:00",
       "sent_at": null
     },
     {
@@ -14625,6 +14712,21 @@
       "expiry_warning_days": 7,
       "created_at": "2026-09-12T08:33:18.731+00:00",
       "updated_at": "2026-09-12T08:33:18.731+00:00"
+    },
+    {
+      "id": "nset_84fe8753-54e5-4583-8a2e-37da43c10449",
+      "user_id": "usr_e05d9930-d223-482e-b432-5822236858cd",
+      "push_enabled": true,
+      "email_enabled": false,
+      "browser_enabled": true,
+      "sound_enabled": true,
+      "reminder_1_enabled": true,
+      "reminder_1_minutes": 30,
+      "reminder_2_enabled": true,
+      "reminder_2_minutes": 5,
+      "expiry_warning_days": 7,
+      "created_at": "2026-09-12T19:57:14.086+00:00",
+      "updated_at": "2026-09-12T19:57:14.086+00:00"
     },
     {
       "id": "nset_90bcfa42-39ee-4606-a3d7-21d965583a91",

@@ -1,0 +1,202 @@
+/* ==========================================================================
+   SMARTTIME AI — BASE DESIGN SYSTEM & TOKENS
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Primary Colors */
+  --primary-purple: #6C63FF;
+  --soft-purple: #8B84FF;
+  --primary-purple-hover: #5A52E0;
+  --primary-purple-light: rgba(108, 99, 255, 0.12);
+  --primary-purple-glow: rgba(108, 99, 255, 0.35);
+
+  /* Secondary Colors */
+  --sky-blue: #5BC0EB;
+  --sky-blue-hover: #48A8D0;
+  --sky-blue-light: rgba(91, 192, 235, 0.14);
+
+  --mint-green: #6EE7B7;
+  --mint-green-dark: #22C55E;
+  --mint-green-light: rgba(110, 231, 183, 0.18);
+
+  /* Accent Colors */
+  --soft-pink: #F8A5C2;
+  --soft-pink-light: rgba(248, 165, 194, 0.2);
+
+  /* Background Colors */
+  --bg-main: #F8F9FF;
+  --bg-white: #FFFFFF;
+  --bg-soft-purple: #F1F0FF;
+  --bg-soft-blue: #EEF8FF;
+  --bg-soft-pink: #FFF1F6;
+  --bg-card: #FFFFFF;
+  --bg-card-glass: rgba(255, 255, 255, 0.85);
+
+  /* Text Colors */
+  --text-primary: #25243A;
+  --text-secondary: #6B6A7C;
+  --text-muted: #9A99A8;
+  --text-on-purple: #FFFFFF;
+
+  /* Status Colors */
+  --status-success: #22C55E;
+  --status-success-bg: #EBFBF0;
+  --status-warning: #F59E0B;
+  --status-warning-bg: #FEF3C7;
+  --status-error: #EF4444;
+  --status-error-bg: #FEE2E2;
+  --status-info: #3B82F6;
+  --status-info-bg: #EFF6FF;
+
+  /* Border & Shadows */
+  --border-color: #E6E8F2;
+  --border-focus: #6C63FF;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 8px rgba(37, 36, 58, 0.04);
+  --shadow-md: 0 6px 20px rgba(108, 99, 255, 0.08);
+  --shadow-lg: 0 12px 36px rgba(108, 99, 255, 0.12);
+  --shadow-float: 0 20px 48px rgba(37, 36, 58, 0.14);
+
+  /* Typography */
+  --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout dimensions */
+  --sidebar-width: 260px;
+  --navbar-height: 72px;
+  --bottombar-height: 64px;
+}
+
+/* Dark theme overrides when enabled in settings */
+[data-theme="dark"] {
+  --bg-main: #12111E;
+  --bg-white: #1C1A2E;
+  --bg-soft-purple: #23203D;
+  --bg-soft-blue: #1A2436;
+  --bg-soft-pink: #2F1E29;
+  --bg-card: #1C1A2E;
+  --bg-card-glass: rgba(28, 26, 46, 0.88);
+
+  --text-primary: #F3F4F9;
+  --text-secondary: #B1B0C4;
+  --text-muted: #747387;
+
+  --border-color: #2D2B44;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+h1 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.01em; }
+h3 { font-size: 1.35rem; font-weight: 600; }
+h4 { font-size: 1.125rem; font-weight: 600; }
+h5 { font-size: 1rem; font-weight: 600; }
+h6 { font-size: 0.875rem; font-weight: 600; }
+
+p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+a {
+  color: var(--primary-purple);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--primary-purple-hover);
+}
+
+img, svg {
+  vertical-align: middle;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D6E8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--soft-purple);
+}
+
+/* Utility Containers */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
