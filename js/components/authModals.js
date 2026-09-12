@@ -61,7 +61,7 @@ export function renderAuthModals(container) {
           <form id="form-signup">
             <div class="form-group">
               <label class="form-label">Full Name</label>
-              <input type="text" id="signup-name" class="form-control" placeholder="e.g. Sarah Khan" required>
+              <input type="text" id="signup-name" class="form-control" placeholder="e.g. manahil" required>
             </div>
             <div class="form-group">
               <label class="form-label">Email Address</label>
@@ -147,12 +147,12 @@ function setupModalHandlers(container) {
       try {
         let res;
         try {
-          res = await api.login({ email: 'alex@smarttime.ai', password: 'password123' });
+          res = await api.login({ email: 'manahilj013@gmail.com', password: 'password123' });
         } catch (e) {
-          // If demo user does not exist in clean DB, register on the fly
+          // If user does not exist in clean DB, register on the fly
           res = await api.register({
-            name: 'Alex Johnson',
-            email: 'alex@smarttime.ai',
+            name: 'manahil',
+            email: 'manahilj013@gmail.com',
             password: 'password123',
             role: 'Student'
           });

@@ -9,8 +9,8 @@ class StateStore {
       storedUser = JSON.parse(localStorage.getItem('smarttime_user') || 'null');
     } catch (e) {}
 
-    // Auto-initialize user as manahil (Student) so live site directly opens the full application
-    if (!storedUser) {
+    // Always ensure user is manahil (Student) to exactly match local environment
+    if (!storedUser || storedUser.name !== 'manahil') {
       storedUser = {
         id: 'usr_24441706-b699-459e-9280-bd16f04f0efa',
         name: 'manahil',

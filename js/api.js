@@ -188,9 +188,9 @@ function handleClientDB(endpoint, options = {}) {
   // 1. Auth
   if (path === '/api/auth/login' && method === 'POST') {
     const user = JSON.parse(localStorage.getItem('smarttime_user') || 'null') || {
-      id: 'usr_' + Date.now(),
-      name: body.email ? body.email.split('@')[0] : 'Sarah Khan',
-      email: body.email || 'sarah@smarttime.ai',
+      id: 'usr_24441706-b699-459e-9280-bd16f04f0efa',
+      name: 'manahil',
+      email: body.email || 'manahilj013@gmail.com',
       role: 'Student'
     };
     return { token: user.id, user };

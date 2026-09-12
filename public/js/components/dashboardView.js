@@ -41,7 +41,7 @@ export async function renderDashboard(container) {
       <div class="dashboard-header">
         <div>
           <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">
-            ${greeting}, ${user?.name || 'Alex'} 👋
+            ${greeting}, ${user?.name || 'manahil'} 👋
           </h1>
           <p style="font-size: 1rem; color: var(--text-secondary);">
             Here's what's on your schedule for <strong>${data.current_date}</strong>.

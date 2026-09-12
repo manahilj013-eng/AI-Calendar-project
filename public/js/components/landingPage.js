@@ -232,17 +232,16 @@ export function renderLandingPage(container) {
   const demoBtn = container.querySelector('#hero-demo-btn');
   if (demoBtn) {
     demoBtn.addEventListener('click', () => {
-      let user = state.user || JSON.parse(localStorage.getItem('smarttime_user') || 'null');
-      if (!user) {
-        user = {
-          id: 'usr_demo_sarah',
-          name: 'Sarah Khan',
-          email: 'sarah@smarttime.ai',
-          role: 'Student',
-          avatar: '👩‍🎓',
-          onboarding_completed: true
-        };
-      }
+      let user = {
+        id: 'usr_24441706-b699-459e-9280-bd16f04f0efa',
+        name: 'manahil',
+        email: 'manahilj013@gmail.com',
+        role: 'Student',
+        timezone: 'pakistan',
+        avatar: 'M',
+        onboarding_completed: true,
+        created_at: '2026-08-30T16:23:24.689+00:00'
+      };
       state.setUser(user, user.id);
       state.setView('dashboard');
     });
