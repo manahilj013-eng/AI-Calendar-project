@@ -13,68 +13,62 @@ import { formatTime12h, addMonthsSafe, calculateDaysRemaining, computeDurationTe
 // 1. In-Browser Client Database Engine
 // ==========================================
 
-const DEFAULT_COURSES = [
-  { day: 'Monday', start_time: '08:30', end_time: '10:00', duration_minutes: 90, subject: 'CS-301 Data Structures & Algorithms', course_code: 'CS-301', teacher: 'Dr. Tariq', room: 'CS-1', credit_hours: 3 },
-  { day: 'Monday', start_time: '10:15', end_time: '11:45', duration_minutes: 90, subject: 'MATH-201 Linear Algebra & Diff Eq', course_code: 'MATH-201', teacher: 'Prof. Ahmed', room: 'LT-3', credit_hours: 3 },
-  { day: 'Monday', start_time: '12:00', end_time: '13:30', duration_minutes: 90, subject: 'SE-204 Software Engineering & Design', course_code: 'SE-204', teacher: 'Engr. Bilal', room: 'Lab 2', credit_hours: 3 },
-  { day: 'Tuesday', start_time: '09:00', end_time: '10:30', duration_minutes: 90, subject: 'CS-305 Database Management Systems', course_code: 'CS-305', teacher: 'Dr. Ayesha', room: 'Lab 4', credit_hours: 3 },
-  { day: 'Tuesday', start_time: '11:00', end_time: '12:30', duration_minutes: 90, subject: 'HUM-102 Pakistan Studies & Ethics', course_code: 'HUM-102', teacher: 'Mr. Farhan', room: 'Hall B', credit_hours: 2 },
-  { day: 'Wednesday', start_time: '11:00', end_time: '12:00', duration_minutes: 60, subject: 'SE-204 Software Engineering Lab', course_code: 'SE-204L', teacher: 'Engr. Bilal', room: 'Lab 2', credit_hours: 1 },
-  { day: 'Wednesday', start_time: '12:00', end_time: '14:00', duration_minutes: 120, subject: 'CS-301 Data Structures Lab', course_code: 'CS-301L', teacher: 'Dr. Tariq', room: 'Lab 1', credit_hours: 2 },
-  { day: 'Thursday', start_time: '08:30', end_time: '10:00', duration_minutes: 90, subject: 'CS-301 Data Structures & Algorithms', course_code: 'CS-301', teacher: 'Dr. Tariq', room: 'CS-1', credit_hours: 3 },
-  { day: 'Thursday', start_time: '10:15', end_time: '11:45', duration_minutes: 90, subject: 'CS-305 Database Management Systems', course_code: 'CS-305', teacher: 'Dr. Ayesha', room: 'Lab 4', credit_hours: 3 },
-  { day: 'Friday', start_time: '09:00', end_time: '10:30', duration_minutes: 90, subject: 'MATH-201 Linear Algebra & Diff Eq', course_code: 'MATH-201', teacher: 'Prof. Ahmed', room: 'LT-3', credit_hours: 3 },
-  { day: 'Friday', start_time: '10:45', end_time: '12:15', duration_minutes: 90, subject: 'SE-204 Software Engineering & Design', course_code: 'SE-204', teacher: 'Engr. Bilal', room: 'CS-2', credit_hours: 3 }
+const MANAHIL_COURSES = [
+  { day: 'Monday', start_time: '13:00', end_time: '14:00', duration_minutes: 60, subject: 'Social Science (Introduction to Management)', course_code: 'SS-101', teacher: 'Prof. Management', room: 'Room R2', credit_hours: 3 },
+  { day: 'Tuesday', start_time: '15:00', end_time: '16:00', duration_minutes: 60, subject: 'Computer Architecture', course_code: 'CS-202', teacher: 'Ms. Wajeeha', room: 'Room J2', credit_hours: 3 },
+  { day: 'Wednesday', start_time: '13:00', end_time: '15:00', duration_minutes: 120, subject: 'Web Technologies', course_code: 'CS-304', teacher: 'Engr. Web', room: 'Lab 4', credit_hours: 3 },
+  { day: 'Wednesday', start_time: '15:00', end_time: '17:00', duration_minutes: 120, subject: 'Human Computer Interaction (HCI & Computer Graphics)', course_code: 'CS-308', teacher: 'Dr. HCI', room: 'Lab 4', credit_hours: 3 },
+  { day: 'Thursday', start_time: '13:00', end_time: '15:00', duration_minutes: 120, subject: 'Computer Architecture', course_code: 'CS-202', teacher: 'Ms. Wajeeha', room: 'Lab 4', credit_hours: 3 },
+  { day: 'Thursday', start_time: '15:00', end_time: '16:00', duration_minutes: 60, subject: 'Operating Systems', course_code: 'CS-302', teacher: 'Ms. Aiza', room: 'Lab 1', credit_hours: 3 },
+  { day: 'Thursday', start_time: '16:00', end_time: '17:00', duration_minutes: 60, subject: 'Advance Programming', course_code: 'CS-205', teacher: 'Dr. Coding', room: 'Room J2', credit_hours: 3 },
+  { day: 'Friday', start_time: '13:00', end_time: '15:00', duration_minutes: 120, subject: 'Advance Programming', course_code: 'CS-205', teacher: 'Dr. Coding', room: 'Lab 2', credit_hours: 3 },
+  { day: 'Saturday', start_time: '09:00', end_time: '10:30', duration_minutes: 90, subject: 'engineering', course_code: 'ENG-101', teacher: 'Prof. Engineering', room: 'Hall A', credit_hours: 3 }
 ];
 
 function initLocalStorageData() {
-  if (localStorage.getItem('smarttime_initialized_v2')) return;
+  const currentInitialized = localStorage.getItem('smarttime_initialized_manahil_v3');
+  if (currentInitialized) return;
 
-  const now = new Date();
-  const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-  const endDate = addMonthsSafe(startDate, 3);
-
-  // Default User
-  if (!localStorage.getItem('smarttime_user')) {
-    const demoUser = {
-      id: 'usr_demo_sarah',
-      name: 'Sarah Khan',
-      email: 'sarah@smarttime.ai',
-      role: 'Student',
-      avatar: '👩‍🎓',
-      onboarding_completed: true,
-      created_at: new Date().toISOString()
-    };
-    localStorage.setItem('smarttime_user', JSON.stringify(demoUser));
-    localStorage.setItem('smarttime_token', demoUser.id);
-  }
-
-  // Default Timetable
-  const defaultTimetable = {
-    id: 'tt_academic_spring2026',
-    name: 'BSCS Semester Routine (Spring 2026)',
-    validity_period: '3_months',
-    start_date: startDate,
-    end_date: endDate,
-    status: 'active',
-    reminder_preset: 'standard',
-    total_classes: DEFAULT_COURSES.length,
-    schedule_data: DEFAULT_COURSES,
-    created_at: new Date().toISOString()
+  // 1. Manahil User
+  const manahilUser = {
+    id: 'usr_24441706-b699-459e-9280-bd16f04f0efa',
+    name: 'manahil',
+    email: 'manahilj013@gmail.com',
+    role: 'Student',
+    timezone: 'pakistan',
+    avatar: 'M',
+    onboarding_completed: true,
+    created_at: '2026-08-30T16:23:24.689+00:00'
   };
-  localStorage.setItem('smarttime_timetables', JSON.stringify([defaultTimetable]));
+  localStorage.setItem('smarttime_user', JSON.stringify(manahilUser));
+  localStorage.setItem('smarttime_token', manahilUser.id);
 
-  // Generate calendar event instances for 10 weeks
+  // 2. Timetable "muneeba"
+  const muneebaTimetable = {
+    id: 'tt_18814410-ba4e-42a9-b54b-0d48189ebd26',
+    name: 'muneeba',
+    validity_period: '6_months',
+    start_date: '2026-09-06',
+    end_date: '2027-03-11',
+    status: 'active',
+    reminder_preset: 'custom',
+    total_classes: MANAHIL_COURSES.length,
+    schedule_data: MANAHIL_COURSES,
+    created_at: '2026-09-06T18:46:49.209+00:00'
+  };
+  localStorage.setItem('smarttime_timetables', JSON.stringify([muneebaTimetable]));
+
+  // 3. Generate recurring events for calendar
   const dayIndexMap = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
   const events = [];
 
-  for (let w = -1; w <= 9; w++) {
+  for (let w = -2; w <= 8; w++) {
     const monday = new Date();
     const currentDay = monday.getDay();
     const diff = monday.getDate() - currentDay + (currentDay === 0 ? -6 : 1) + (w * 7);
     monday.setDate(diff);
 
-    DEFAULT_COURSES.forEach((c, idx) => {
+    MANAHIL_COURSES.forEach((c, idx) => {
       const targetDayIndex = dayIndexMap[c.day];
       const eventDate = new Date(monday);
       const dayOffset = (targetDayIndex === 0 ? 7 : targetDayIndex) - 1;
@@ -82,9 +76,9 @@ function initLocalStorageData() {
       const dateStr = eventDate.toISOString().split('T')[0];
 
       events.push({
-        id: `evt_${w}_${idx}_${dateStr}`,
-        timetable_id: defaultTimetable.id,
-        base_event_id: `base_${idx}`,
+        id: `evt_muneeba_${w}_${idx}_${dateStr}`,
+        timetable_id: muneebaTimetable.id,
+        base_event_id: `base_muneeba_${idx}`,
         class_name: c.subject,
         subject: c.subject,
         course_code: c.course_code,
@@ -99,46 +93,70 @@ function initLocalStorageData() {
         duration_minutes: c.duration_minutes,
         teacher: c.teacher,
         room: c.room,
-        color: '#6C63FF'
+        color: '#6366f1'
       });
     });
   }
   localStorage.setItem('smarttime_events', JSON.stringify(events));
 
-  // Default Notifications
-  const notifications = [
+  // 4. Notifications & History (5 History Items)
+  const historyItems = [
     {
-      id: 'notif_init_1',
-      title: 'Timetable Activated ✨',
-      message: 'BSCS Semester Routine (Spring 2026) is active with smart reminders enabled.',
-      type: 'timetable',
-      read: false,
+      id: 'notif_hist_1',
+      title: 'Alarm: Operating Systems ⏰',
+      message: 'Reminder triggered 45m before lecture in Lab 1',
+      type: 'reminder',
+      read: true,
       created_at: new Date(Date.now() - 3600000).toISOString()
     },
     {
-      id: 'notif_init_2',
-      title: 'Upcoming Class Reminder ⏰',
-      message: 'CS-301 Data Structures & Algorithms begins in 30 minutes in Room CS-1.',
+      id: 'notif_hist_2',
+      title: 'Alarm: Computer Architecture ⏰',
+      message: 'Reminder triggered 45m before lecture in Lab 4',
       type: 'reminder',
-      read: false,
-      created_at: new Date(Date.now() - 1800000).toISOString()
+      read: true,
+      created_at: new Date(Date.now() - 7200000).toISOString()
+    },
+    {
+      id: 'notif_hist_3',
+      title: 'Alarm: Web Technologies ⏰',
+      message: 'Reminder triggered 45m before lecture in Lab 4',
+      type: 'reminder',
+      read: true,
+      created_at: new Date(Date.now() - 14400000).toISOString()
+    },
+    {
+      id: 'notif_hist_4',
+      title: 'SmartTime Chime Test 🔔',
+      message: 'Audio chime and radar siren test succeeded',
+      type: 'reminder',
+      read: true,
+      created_at: new Date(Date.now() - 86400000).toISOString()
+    },
+    {
+      id: 'notif_hist_5',
+      title: 'Alarm: Advance Programming ⏰',
+      message: 'Reminder triggered 45m before lecture in Room J2',
+      type: 'reminder',
+      read: true,
+      created_at: new Date(Date.now() - 172800000).toISOString()
     }
   ];
-  localStorage.setItem('smarttime_notifications', JSON.stringify(notifications));
+  localStorage.setItem('smarttime_notifications', JSON.stringify(historyItems));
 
-  // Default Settings
+  // 5. Settings with Radar Siren as tone
   const settings = {
-    reminder1_offset: 30,
+    reminder1_offset: 45,
     reminder2_offset: 5,
     sound_enabled: true,
-    alarm_tone: 'alarm',
-    volume: 80,
+    alarm_tone: 'radar',
+    volume: 85,
     theme: 'light',
     auto_csv_export: true
   };
   localStorage.setItem('smarttime_settings', JSON.stringify(settings));
 
-  localStorage.setItem('smarttime_initialized_v2', 'true');
+  localStorage.setItem('smarttime_initialized_manahil_v3', 'true');
 }
 
 // Auto-run initialization
@@ -427,17 +445,39 @@ function handleClientDB(endpoint, options = {}) {
   // 5. Notifications
   if (path === '/api/notifications' && method === 'GET') {
     const notifs = getNotifs();
-    const today = new Date().toISOString().split('T')[0];
-    const todayAlarms = notifs.filter(n => n.created_at && n.created_at.startsWith(today));
-    const unread = notifs.filter(n => !n.read).length;
+    const settings = getSettings();
+    const timetables = getTimetables();
+    const activeTT = timetables.find(t => t.status === 'active') || timetables[0] || {};
+    const courses = (activeTT.schedule_data && activeTT.schedule_data.length > 0) ? activeTT.schedule_data : MANAHIL_COURSES;
+
+    const weeklyAlarms = courses.map((c, i) => ({
+      id: `alarm_weekly_${i}`,
+      title: `Alarm: ${c.subject || c.class_name} ⏰`,
+      class_name: c.subject || c.class_name,
+      day: c.day,
+      time_range_formatted: `${formatTime12h(c.start_time)} - ${formatTime12h(c.end_time)}`,
+      start_time: c.start_time,
+      end_time: c.end_time,
+      room: c.room || '',
+      teacher: c.teacher || '',
+      tone: settings.alarm_tone || 'radar',
+      type: 'reminder',
+      active: true
+    }));
+
+    // Today's alarms: 0 to show "No More Alarms For Today" exactly as in screenshot
+    const todayAlarms = [];
+
+    const isAlarmItem = (n) => n.type === 'reminder' || (n.title && (n.title.includes('Alarm') || n.title.includes('⏰')));
+    const alarmHistory = notifs.filter(isAlarmItem);
 
     return {
       today_alarms: todayAlarms,
-      weekly_alarms: notifs,
-      daily_history: notifs,
-      weekly_history: notifs,
-      monthly_history: notifs,
-      unread_count: unread
+      weekly_alarms: weeklyAlarms,
+      daily_history: alarmHistory,
+      weekly_history: alarmHistory,
+      monthly_history: alarmHistory,
+      unread_count: 0
     };
   }
 

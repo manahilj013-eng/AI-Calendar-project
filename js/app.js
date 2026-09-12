@@ -37,6 +37,11 @@ function initApp() {
   // Sync route on hash change
   window.addEventListener('hashchange', handleHashChange);
 
+  // If no hash specified or set to landing, automatically navigate to dashboard
+  if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#landing') {
+    window.location.hash = '#dashboard';
+  }
+
   // Initial Route & initial render
   handleHashChange();
   renderCurrentView(appContainer);
@@ -96,12 +101,16 @@ function handleHashChange() {
 
   if (state.user && hash === 'landing') {
     state.currentView = 'dashboard';
+    window.location.hash = '#dashboard';
     state.notify();
     return;
   }
 
-  if (state.currentView !== hash) {
-    state.currentView = hash;
+  const validViews = ['dashboard', 'calendar', 'timetables', 'notifications', 'settings', 'add-schedule'];
+  const nextView = validViews.includes(hash) ? hash : 'dashboard';
+
+  if (state.currentView !== nextView) {
+    state.currentView = nextView;
     state.notify();
   }
 }

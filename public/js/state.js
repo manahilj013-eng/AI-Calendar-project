@@ -4,12 +4,34 @@
 
 class StateStore {
   constructor() {
-    this.user = JSON.parse(localStorage.getItem('smarttime_user') || 'null');
-    this.token = localStorage.getItem('smarttime_token') || null;
+    let storedUser = null;
+    try {
+      storedUser = JSON.parse(localStorage.getItem('smarttime_user') || 'null');
+    } catch (e) {}
+
+    // Auto-initialize user as manahil (Student) so live site directly opens the full application
+    if (!storedUser) {
+      storedUser = {
+        id: 'usr_24441706-b699-459e-9280-bd16f04f0efa',
+        name: 'manahil',
+        email: 'manahilj013@gmail.com',
+        role: 'Student',
+        timezone: 'pakistan',
+        avatar: 'M',
+        onboarding_completed: true,
+        created_at: '2026-08-30T16:23:24.689+00:00'
+      };
+      localStorage.setItem('smarttime_user', JSON.stringify(storedUser));
+      localStorage.setItem('smarttime_token', storedUser.id);
+    }
+
+    this.user = storedUser;
+    this.token = localStorage.getItem('smarttime_token') || (storedUser ? storedUser.id : null);
     this.settings = null;
     this.activeTimetable = null;
     this.unreadCount = 0;
-    this.currentView = this.user ? 'dashboard' : 'landing';
+    const initialHash = window.location.hash.replace('#', '');
+    this.currentView = initialHash && initialHash !== 'landing' ? initialHash : 'dashboard';
     this.theme = localStorage.getItem('smarttime_theme') || 'light';
     this.listeners = [];
 
