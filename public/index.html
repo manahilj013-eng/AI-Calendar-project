@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SmartTime AI — Your Schedule. Automatically Organized.</title>
+  <meta name="description" content="AI-powered timetable and schedule management application. Upload your timetable photo, speak your classes naturally, or enter manually. SmartTime AI automatically organizes your calendar and reminds you before every class.">
+  <meta name="theme-color" content="#6C63FF">
+
+  <!-- PWA & Mobile Web App Capabilities -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SmartTime AI">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+
+  <!-- Favicon icon -->
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="alternate icon" href="/icons/icon-192.png">
+
+  <!-- Google Fonts: Poppins (Headings) & Inter (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+  <!-- Main Single Page Application Root -->
+  <div id="app"></div>
+
+  <!-- Global Modal Root Container -->
+  <div id="modal-root"></div>
+
+  <!-- Tesseract.js for In-Browser Timetable OCR Vision -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <!-- Cache Prevention Meta -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- Service Worker Registration for PWA / Mobile App -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js?v=1.0.8')
+          .then((reg) => {
+            console.log('📱 Service Worker registered (v1.0.8) with scope:', reg.scope);
+            reg.update();
+          })
+          .catch((err) => console.warn('SW registration failed:', err));
+      });
+    }
+  </script>
+
+  <!-- Main ES Module Entry Point with cache buster -->
+  <script type="module" src="/js/app.js?v=1.0.6"></script>
+</body>
+</html>

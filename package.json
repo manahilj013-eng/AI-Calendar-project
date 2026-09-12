@@ -1,0 +1,41 @@
+{
+  "name": "smarttime-ai",
+  "version": "1.0.0",
+  "description": "SmartTime AI - Your Schedule. Automatically Organized.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "node tests/runTests.js",
+    "db:migrate": "node server/database/migrateToSupabase.js",
+    "cap:sync": "cap sync",
+    "cap:add:android": "cap add android",
+    "cap:android": "cap open android",
+    "build:app": "cap sync"
+  },
+  "keywords": [
+    "timetable",
+    "calendar",
+    "ai",
+    "ocr",
+    "speech-to-text",
+    "smart-schedule",
+    "reminders"
+  ],
+  "author": "SmartTime AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/core": "^8.5.1",
+    "@supabase/supabase-js": "^2.115.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.23.0",
+    "tesseract.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1"
+  }
+}

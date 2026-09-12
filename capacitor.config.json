@@ -1,0 +1,21 @@
+{
+  "appId": "com.smarttime.ai",
+  "appName": "SmartTime AI",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1800,
+      "backgroundColor": "#6C63FF",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#6C63FF"
+    }
+  }
+}

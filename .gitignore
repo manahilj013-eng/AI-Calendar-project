@@ -1,0 +1,8 @@
+# Local links & external mounted directories
+local_downloads/
+local_downloads
+
+# Environment & Dependencies
+node_modules/
+.env
+uploads/
