@@ -1,3 +1,22 @@
+# 📁 AI Calendar Project — Full Source Code & Application Folder
+
+> 🌟 **Project Status: FULL FOLDER 100% UPLOADED & SAVED**
+>
+> Aapka pura project folder (saare codes, frontend, backend, database, aur UI files) is repository mein safely upload ho chuka hai!
+>
+> ### 📂 Project File & Directory Browser:
+> Page ke upar aapko project ke saare folders nazar aayenge:
+> - 📁 **`public/`** — Frontend Web Application (HTML, CSS, JavaScript, Calendar Views, Wizards)
+> - 📁 **`server/`** — Backend Server (Node.js/Express, AI Parser, Recurrence Engine, API routes)
+> - 📁 **`data/`** — Database Storage (`smarttime.json`)
+> - 📁 **`tests/`** — Automated Test Suites
+> - 📁 **`uploads/`** — Timetable Uploads & Assets
+> - 📦 **`AI-Calendar-Project-Complete-Folder.zip`** — Pura project folder ek click mein download karne ke liye
+>
+> 💡 **Pure folder ko download karne ke liye:** Page ke top par green button **`Code`** par click karke **`Download ZIP`** select karein.
+
+---
+
 
 # SMARTTIME AI ⏰✨
 
