@@ -34,6 +34,21 @@ export function calculateDaysRemaining(endDateStr) {
   return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 }
 
+export function formatLocalDate(d) {
+  if (!d) return '';
+  const dateObj = typeof d === 'string' ? new Date(d) : d;
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+export function parseLocalDate(dateStr) {
+  if (!dateStr) return new Date();
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d, 12, 0, 0);
+}
+
 export function addMonthsSafe(baseDateStrOrObj, months) {
   const d = new Date(baseDateStrOrObj);
   const originalDay = d.getDate();
@@ -41,7 +56,7 @@ export function addMonthsSafe(baseDateStrOrObj, months) {
   d.setMonth(d.getMonth() + months);
   const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
   d.setDate(Math.min(originalDay, lastDay));
-  return d.toISOString().split('T')[0];
+  return formatLocalDate(d);
 }
 
 export function computeDurationText(startDateStr, endDateStr, explicitMonths) {

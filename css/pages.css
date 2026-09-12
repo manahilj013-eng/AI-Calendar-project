@@ -448,16 +448,18 @@
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.5rem;
+  width: 100%;
 }
 
 .calendar-header-day {
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.825rem;
   color: var(--text-secondary);
   padding: 0.5rem 0;
+  min-width: 0;
 }
 
 .calendar-cell {
@@ -470,6 +472,9 @@
   flex-direction: column;
   gap: 0.35rem;
   transition: all var(--transition-fast);
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 .calendar-cell-clickable {

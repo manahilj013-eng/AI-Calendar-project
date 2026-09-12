@@ -7,7 +7,7 @@
 import { api } from '../api.js';
 import { state } from '../state.js';
 import { showToast } from './toast.js';
-import { formatTime12h, formatDatePretty, DAYS_LIST } from '../utils/dateUtils.js';
+import { formatTime12h, formatDatePretty, DAYS_LIST, formatLocalDate, parseLocalDate } from '../utils/dateUtils.js';
 import { playAlarmTone, getSavedAlarmTone } from '../utils/audioUtils.js';
 
 let activeCalendarView = 'week'; // 'day' | 'week' | 'month'
@@ -24,15 +24,22 @@ export async function renderCalendar(container) {
 
   try {
     // Calculate range based on active view
-    const { startDateStr, endDateStr, titleStr } = calculateViewDateRange();
+    const { startDateStr, endDateStr, titleStr, viewLabel } = calculateViewDateRange();
     const data = await api.getEvents(startDateStr, endDateStr);
     const events = data.events || [];
 
     container.innerHTML = `
       <!-- Calendar Controls -->
       <div class="calendar-controls">
-        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-          <h2 style="font-size: 1.6rem; min-width: 240px; margin: 0;">${titleStr}</h2>
+        <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;">
+          <div>
+            <h2 id="calendar-heading-title" style="font-size: 1.65rem; margin: 0; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.45rem; line-height: 1.2;">
+              <span>📅</span> ${viewLabel || 'Weekly Calendar'}
+            </h2>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); font-weight: 600; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
+              <span>🗓️</span> <span>${titleStr}</span>
+            </div>
+          </div>
           <div style="display: flex; gap: 0.25rem;">
             <button id="cal-nav-prev" class="btn btn-outline btn-icon" title="Previous">◀</button>
             <button id="cal-nav-today" class="btn btn-outline btn-sm">Today</button>
@@ -96,7 +103,7 @@ export async function renderCalendar(container) {
     });
 
     container.querySelector('#cal-add-class-btn')?.addEventListener('click', () => {
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = formatLocalDate(new Date());
       openAddCalendarEventModal(container, todayStr);
     });
   } catch (err) {
@@ -119,87 +126,98 @@ function calculateViewDateRange() {
   const ref = new Date(calendarReferenceDate);
 
   if (activeCalendarView === 'day') {
-    const dStr = ref.toISOString().split('T')[0];
+    const dStr = formatLocalDate(ref);
     return {
       startDateStr: dStr,
       endDateStr: dStr,
-      titleStr: ref.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })
+      titleStr: ref.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }),
+      viewLabel: 'Daily Calendar'
     };
   } else if (activeCalendarView === 'week') {
-    const day = ref.getDay(); // 0 is Sun
-    const diffToMonday = ref.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(ref.setDate(diffToMonday));
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
+    const day = ref.getDay(); // 0 is Sun, 1 is Mon...
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const monday = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate() + diffToMonday, 12, 0, 0);
+    const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6, 12, 0, 0);
+
+    const startDateStr = formatLocalDate(monday);
+    const endDateStr = formatLocalDate(sunday);
+    const titleStr = `${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
     return {
-      startDateStr: monday.toISOString().split('T')[0],
-      endDateStr: sunday.toISOString().split('T')[0],
-      titleStr: `${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+      startDateStr,
+      endDateStr,
+      titleStr,
+      viewLabel: 'Weekly Calendar'
     };
   } else {
     // Month
     const y = ref.getFullYear();
     const m = ref.getMonth();
-    const firstDay = new Date(y, m, 1);
-    const lastDay = new Date(y, m + 1, 0);
+    const firstDay = new Date(y, m, 1, 12, 0, 0);
+    const lastDay = new Date(y, m + 1, 0, 12, 0, 0);
 
     return {
-      startDateStr: firstDay.toISOString().split('T')[0],
-      endDateStr: lastDay.toISOString().split('T')[0],
-      titleStr: ref.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      startDateStr: formatLocalDate(firstDay),
+      endDateStr: formatLocalDate(lastDay),
+      titleStr: ref.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      viewLabel: 'Monthly Calendar'
     };
   }
 }
 
 // WEEK VIEW
 function renderWeekView(container, events, weekStartStr) {
-  const start = new Date(weekStartStr);
+  const [sy, sm, sd] = weekStartStr.split('-').map(Number);
   const weekDays = [];
 
   for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
+    const d = new Date(sy, sm - 1, sd + i, 12, 0, 0);
     weekDays.push(d);
   }
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = formatLocalDate(today);
 
   container.innerHTML = `
-    <div class="calendar-scroll-wrapper">
-      <div style="display: grid; grid-template-columns: repeat(7, 1fr); min-width: 700px; gap: 0.5rem;">
+    <div class="calendar-scroll-wrapper" style="width: 100%; overflow-x: auto;">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%; min-width: 680px; gap: 0.45rem;">
         ${weekDays
           .map((d) => {
-            const dStr = d.toISOString().split('T')[0];
+            const dStr = formatLocalDate(d);
             const isToday = dStr === todayStr;
             const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+            const dayFullName = d.toLocaleDateString('en-US', { weekday: 'long' });
             const dayNum = d.getDate();
-            const dayEvents = events.filter((e) => e.date === dStr);
+            const dayEvents = events.filter((e) => e.date === dStr || (!e.date && (e.day === dayFullName || e.day === dayName)));
 
             return `
-            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-              <div class="calendar-cell-clickable" data-date="${dStr}" title="Click to add schedule for ${dayName}" style="text-align: center; padding: 0.5rem; border-radius: var(--radius-md); ${isToday ? 'background: var(--primary-purple); color: white; font-weight: bold;' : 'background: var(--bg-main); color: var(--text-secondary);'}">
-                <div style="font-size: 0.75rem; text-transform: uppercase;">${dayName}</div>
-                <div style="font-size: 1.15rem; font-weight: 700;">${dayNum}</div>
+            <div style="display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; width: 100%;">
+              <div class="calendar-cell-clickable" data-date="${dStr}" title="Click to add schedule for ${dayFullName} (${dStr})" style="text-align: center; padding: 0.5rem 0.25rem; border-radius: var(--radius-md); ${isToday ? 'background: var(--primary-purple); color: white; font-weight: bold; box-shadow: 0 4px 12px var(--primary-purple-glow);' : 'background: var(--bg-main); color: var(--text-secondary);'}">
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">${dayName}</div>
+                <div style="font-size: 1.15rem; font-weight: 800; line-height: 1.2;">${dayNum}</div>
               </div>
 
-              <div class="calendar-cell calendar-cell-clickable ${isToday ? 'today' : ''}" data-date="${dStr}" style="min-height: 380px;" title="Click anywhere to add schedule on this day">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-                  <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">${dayEvents.length} Classes</span>
+              <div class="calendar-cell calendar-cell-clickable ${isToday ? 'today' : ''}" data-date="${dStr}" style="min-height: 400px; min-width: 0; width: 100%; overflow: hidden; padding: 0.45rem;" title="Click anywhere to add schedule on this day">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">${dayEvents.length} Classes</span>
                   <span class="cell-add-btn" title="Add schedule on this day">+</span>
                 </div>
 
                 ${
                   dayEvents.length === 0
-                    ? `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 1.5rem; padding: 0.5rem; border: 1px dashed var(--border-color); border-radius: 6px;">
+                    ? `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 2rem; padding: 0.5rem 0.25rem; border: 1px dashed var(--border-color); border-radius: 6px;">
                          + Click to add schedule
                        </div>`
                     : dayEvents
                         .map(
                           (evt) => `
-                      <div class="event-pill event-click-target" data-event-id="${evt.base_event_id}" data-date="${evt.date}" style="padding: 0.4rem 0.6rem; margin-bottom: 4px;" title="View details">
-                        <div style="font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${evt.class_name}</div>
-                        <div style="font-size: 0.68rem; opacity: 0.9;">⏰ ${evt.start_time_formatted}</div>
+                      <div class="event-pill event-click-target" data-event-id="${evt.base_event_id || evt.id}" data-date="${evt.date || dStr}" style="padding: 0.45rem 0.5rem; margin-bottom: 5px; min-width: 0; max-width: 100%; overflow: hidden; cursor: pointer;" title="${evt.class_name || evt.subject} (${evt.start_time_formatted || evt.start_time})">
+                        <div style="font-weight: 700; font-size: 0.76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" title="${evt.class_name || evt.subject}">
+                          ${evt.class_name || evt.subject}
+                        </div>
+                        <div style="font-size: 0.68rem; opacity: 0.9; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          ⏰ ${evt.start_time_formatted || evt.start_time}
+                        </div>
                       </div>
                     `
                         )
@@ -284,22 +302,23 @@ function renderDayView(container, events, dayStr) {
 
 // MONTH VIEW
 function renderMonthView(container, events, firstDayStr) {
-  const ref = new Date(firstDayStr);
-  const y = ref.getFullYear();
-  const m = ref.getMonth();
+  const [ry, rm] = firstDayStr.split('-').map(Number);
+  const y = ry;
+  const m = rm - 1;
   const daysInMonth = new Date(y, m + 1, 0).getDate();
-  const firstDayOfWeek = new Date(y, m, 1).getDay(); // 0 is Sun
+  const firstDayOfWeek = new Date(y, m, 1, 12, 0, 0).getDay(); // 0 is Sun
   const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Align to Mon
 
   const cells = [];
   for (let i = 0; i < offset; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = formatLocalDate(today);
 
   container.innerHTML = `
     <div class="calendar-scroll-wrapper">
-      <div style="display: grid; grid-template-columns: repeat(7, 1fr); min-width: 650px; gap: 0.4rem;">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%; min-width: 650px; gap: 0.4rem;">
         ${DAYS_LIST.map((d) => `<div class="calendar-header-day">${d.substring(0, 3)}</div>`).join('')}
 
         ${cells
@@ -308,24 +327,24 @@ function renderMonthView(container, events, firstDayStr) {
               return `<div class="calendar-cell" style="background: transparent; border: none; min-height: 80px;"></div>`;
             }
 
-            const dObj = new Date(y, m, dayNum);
-            const dStr = dObj.toISOString().split('T')[0];
+            const dObj = new Date(y, m, dayNum, 12, 0, 0);
+            const dStr = formatLocalDate(dObj);
             const isToday = dStr === todayStr;
             const dayEvents = events.filter((e) => e.date === dStr);
 
             return `
-            <div class="calendar-cell calendar-cell-clickable ${isToday ? 'today' : ''}" data-date="${dStr}" style="min-height: 95px;" title="Click on this date to add schedule & alarm">
+            <div class="calendar-cell calendar-cell-clickable ${isToday ? 'today' : ''}" data-date="${dStr}" style="min-height: 95px; min-width: 0; overflow: hidden;" title="Click on this date to add schedule & alarm">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-weight: 700; font-size: 0.82rem; ${isToday ? 'color: var(--primary-purple);' : ''}">${dayNum}</span>
                 <span class="cell-add-btn" title="Add schedule on this day">+</span>
               </div>
-              <div class="cell-events-list" style="display: flex; flex-direction: column; gap: 2px; margin-top: 3px;">
+              <div class="cell-events-list" style="display: flex; flex-direction: column; gap: 2px; margin-top: 3px; min-width: 0; overflow: hidden;">
                 ${dayEvents
                   .slice(0, 2)
                   .map(
                     (evt) => `
-                  <div class="event-pill event-click-target" data-event-id="${evt.base_event_id}" data-date="${evt.date}" style="padding: 2px 5px; font-size: 0.72rem;" title="${evt.class_name} (${evt.start_time_formatted})">
-                    ${evt.class_name}
+                  <div class="event-pill event-click-target" data-event-id="${evt.base_event_id || evt.id}" data-date="${evt.date || dStr}" style="padding: 2px 5px; font-size: 0.72rem; min-width: 0; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${evt.class_name || evt.subject} (${evt.start_time_formatted || evt.start_time})">
+                    ${evt.class_name || evt.subject}
                   </div>
                 `
                   )
@@ -383,15 +402,15 @@ function attachEventClickListeners(container, events) {
  */
 function openAddCalendarEventModal(container, prefilledDate) {
   const holder = document.querySelector('#modal-event-details-container') || container;
-  const targetDate = prefilledDate || new Date().toISOString().split('T')[0];
+  const targetDate = prefilledDate || formatLocalDate(new Date());
   const [targetY, targetM, targetD] = targetDate.split('-').map(Number);
-  const dateObj = new Date(targetY, targetM - 1, targetD, 0, 0, 0, 0);
+  const dateObj = new Date(targetY, targetM - 1, targetD, 12, 0, 0);
   const DAYS_NAME = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayName = DAYS_NAME[dateObj.getDay()];
 
   // Default end date (7 days later) for multi-day
-  const nextWeekDate = new Date(targetY, targetM - 1, targetD + 7, 0, 0, 0, 0);
-  const defaultEndDate = `${nextWeekDate.getFullYear()}-${String(nextWeekDate.getMonth() + 1).padStart(2, '0')}-${String(nextWeekDate.getDate()).padStart(2, '0')}`;
+  const nextWeekDate = new Date(targetY, targetM - 1, targetD + 7, 12, 0, 0);
+  const defaultEndDate = formatLocalDate(nextWeekDate);
 
   let activeWeeksCount = 1; // 1, 2, 4, 8, 12, or custom
   let isCustomWeeks = false;

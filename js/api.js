@@ -7,7 +7,7 @@
 
 import { state } from './state.js';
 import { eventsToCSV, parseCSVToEvents } from './utils/csvUtils.js';
-import { formatTime12h, addMonthsSafe, calculateDaysRemaining, computeDurationText } from './utils/dateUtils.js';
+import { formatTime12h, addMonthsSafe, calculateDaysRemaining, computeDurationText, formatLocalDate, parseLocalDate } from './utils/dateUtils.js';
 
 // ==========================================
 // 1. In-Browser Client Database Engine
@@ -26,7 +26,7 @@ const MANAHIL_COURSES = [
 ];
 
 function initLocalStorageData() {
-  const currentInitialized = localStorage.getItem('smarttime_initialized_manahil_v3');
+  const currentInitialized = localStorage.getItem('smarttime_initialized_manahil_v4');
   if (currentInitialized) return;
 
   // 1. Manahil User
@@ -62,18 +62,20 @@ function initLocalStorageData() {
   const dayIndexMap = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
   const events = [];
 
-  for (let w = -2; w <= 8; w++) {
-    const monday = new Date();
-    const currentDay = monday.getDay();
-    const diff = monday.getDate() - currentDay + (currentDay === 0 ? -6 : 1) + (w * 7);
-    monday.setDate(diff);
+  const today = new Date();
+  const currentDay = today.getDay();
+  const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+  const thisWeekMonday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diffToMonday, 12, 0, 0);
+
+  for (let w = -4; w <= 12; w++) {
+    const monday = new Date(thisWeekMonday.getFullYear(), thisWeekMonday.getMonth(), thisWeekMonday.getDate() + (w * 7), 12, 0, 0);
 
     MANAHIL_COURSES.forEach((c, idx) => {
       const targetDayIndex = dayIndexMap[c.day];
-      const eventDate = new Date(monday);
+      if (targetDayIndex === undefined) return;
       const dayOffset = (targetDayIndex === 0 ? 7 : targetDayIndex) - 1;
-      eventDate.setDate(monday.getDate() + dayOffset);
-      const dateStr = eventDate.toISOString().split('T')[0];
+      const eventDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + dayOffset, 12, 0, 0);
+      const dateStr = formatLocalDate(eventDate);
 
       events.push({
         id: `evt_muneeba_${w}_${idx}_${dateStr}`,
@@ -156,7 +158,7 @@ function initLocalStorageData() {
   };
   localStorage.setItem('smarttime_settings', JSON.stringify(settings));
 
-  localStorage.setItem('smarttime_initialized_manahil_v3', 'true');
+  localStorage.setItem('smarttime_initialized_manahil_v4', 'true');
 }
 
 // Auto-run initialization
@@ -235,7 +237,7 @@ function handleClientDB(endpoint, options = {}) {
     const activeTT = timetables.find(t => t.status === 'active') || timetables[0] || null;
     const events = getEvents();
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = formatLocalDate(new Date());
     const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
     // Find today's events
@@ -310,7 +312,7 @@ function handleClientDB(endpoint, options = {}) {
       id: newId,
       name: body.name || 'New Timetable Schedule',
       validity_period: body.validity_period || '3_months',
-      start_date: body.start_date || new Date().toISOString().split('T')[0],
+      start_date: body.start_date || formatLocalDate(new Date()),
       end_date: body.end_date || addMonthsSafe(new Date(), 3),
       status: 'active',
       reminder_preset: body.reminder_preset || 'standard',
@@ -326,19 +328,20 @@ function handleClientDB(endpoint, options = {}) {
     const dayIndexMap = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
     const newEvents = [];
 
+    const today = new Date();
+    const currentDay = today.getDay();
+    const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+    const thisWeekMonday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diffToMonday, 12, 0, 0);
+
     for (let w = 0; w <= 12; w++) {
-      const monday = new Date();
-      const currentDay = monday.getDay();
-      const diff = monday.getDate() - currentDay + (currentDay === 0 ? -6 : 1) + (w * 7);
-      monday.setDate(diff);
+      const monday = new Date(thisWeekMonday.getFullYear(), thisWeekMonday.getMonth(), thisWeekMonday.getDate() + (w * 7), 12, 0, 0);
 
       (newTT.schedule_data || []).forEach((c, idx) => {
         const targetDayIndex = dayIndexMap[c.day];
         if (targetDayIndex === undefined) return;
-        const eventDate = new Date(monday);
         const dayOffset = (targetDayIndex === 0 ? 7 : targetDayIndex) - 1;
-        eventDate.setDate(monday.getDate() + dayOffset);
-        const dateStr = eventDate.toISOString().split('T')[0];
+        const eventDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + dayOffset, 12, 0, 0);
+        const dateStr = formatLocalDate(eventDate);
 
         newEvents.push({
           id: `evt_${newId}_${w}_${idx}`,
