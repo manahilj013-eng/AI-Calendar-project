@@ -54,6 +54,11 @@ export async function renderCalendar(container) {
             <button class="btn btn-sm ${activeCalendarView === 'month' ? 'btn-primary' : 'btn-ghost'} cal-view-btn" data-v="month">Month</button>
           </div>
 
+          <button id="cal-sync-gcal-btn" class="btn btn-outline" style="font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;" title="Sync with Google Calendar or export schedule">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M19.5 3h-3V1.5H15V3H9V1.5H7.5V3h-3C3.67 3 3 3.67 3 4.5v15c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5v-15c0-.83-.67-1.5-1.5-1.5zm0 16.5h-15V8.5h15v11z"/><circle cx="8" cy="12" r="1.2" fill="#EA4335"/><circle cx="12" cy="12" r="1.2" fill="#FBBC05"/><circle cx="16" cy="12" r="1.2" fill="#34A853"/></svg>
+            <span>Sync / Export</span>
+          </button>
+
           <button id="cal-add-class-btn" class="btn btn-primary" style="background: linear-gradient(135deg, var(--primary-purple), #4f46e5); font-weight: 700; box-shadow: 0 4px 14px var(--primary-purple-glow); display: inline-flex; align-items: center; gap: 0.35rem;">
             <span>➕</span> Add Schedule & Alarm
           </button>
@@ -100,6 +105,10 @@ export async function renderCalendar(container) {
     container.querySelector('#cal-nav-next')?.addEventListener('click', () => {
       adjustDate(1);
       renderCalendar(container);
+    });
+
+    container.querySelector('#cal-sync-gcal-btn')?.addEventListener('click', () => {
+      openCalendarSyncModal(container);
     });
 
     container.querySelector('#cal-add-class-btn')?.addEventListener('click', () => {
@@ -1240,6 +1249,14 @@ function openEventDetailsModal(eventObj, container) {
               🗑 Delete Class
             </button>
           </div>
+
+          <!-- Add to Google Calendar 1-Click Button -->
+          <div style="margin-top: 1rem;">
+            <a id="btn-modal-gcal-link" href="#" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--bg-card); font-weight: 700; padding: 0.75rem; border-color: rgba(66, 133, 244, 0.4);">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M19.5 3h-3V1.5H15V3H9V1.5H7.5V3h-3C3.67 3 3 3.67 3 4.5v15c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5v-15c0-.83-.67-1.5-1.5-1.5zm0 16.5h-15V8.5h15v11z"/><circle cx="8" cy="12" r="1.2" fill="#EA4335"/><circle cx="12" cy="12" r="1.2" fill="#FBBC05"/><circle cx="16" cy="12" r="1.2" fill="#34A853"/></svg>
+              <span>Add to Google Calendar 📅</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1248,6 +1265,27 @@ function openEventDetailsModal(eventObj, container) {
   holder.querySelectorAll('.modal-close').forEach((btn) => {
     btn.addEventListener('click', () => (holder.innerHTML = ''));
   });
+
+  // Calculate Google Calendar 1-click URL
+  const gcalBtn = holder.querySelector('#btn-modal-gcal-link');
+  if (gcalBtn) {
+    const pad = (n) => String(n).padStart(2, '0');
+    let startD = new Date();
+    if (eventObj.date) {
+      const [y, m, d] = eventObj.date.split('-').map(Number);
+      startD = new Date(y, m - 1, d, 0, 0, 0);
+    }
+    const [sh, sm] = (eventObj.start_time || '09:00').split(':').map(Number);
+    startD.setHours(sh || 9, sm || 0, 0);
+    const durMins = Number(eventObj.duration) || 60;
+    const endD = new Date(startD.getTime() + durMins * 60 * 1000);
+
+    const fmtG = (dt) => dt.getFullYear() + pad(dt.getMonth() + 1) + pad(dt.getDate()) + 'T' + pad(dt.getHours()) + pad(dt.getMinutes()) + '00';
+    const title = encodeURIComponent(eventObj.class_name || 'Class');
+    const desc = encodeURIComponent(`Subject: ${eventObj.subject || ''}\nInstructor: ${eventObj.teacher || ''}\nRoom: ${eventObj.room || ''}\nOrganized with SmartTime AI`);
+    const loc = encodeURIComponent(eventObj.room || eventObj.location || '');
+    gcalBtn.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmtG(startD)}/${fmtG(endD)}&details=${desc}&location=${loc}`;
+  }
 
   // Reschedule
   holder.querySelector('#btn-modal-reschedule').addEventListener('click', () => {
@@ -1332,6 +1370,157 @@ function openEventDetailsModal(eventObj, container) {
           })
           .catch((err) => showToast(err.message, 'error'));
       }
+    }
+  });
+}
+
+/**
+ * Google Calendar & iCal Synchronization Modal
+ */
+function openCalendarSyncModal(container) {
+  let holder = container.querySelector('#modal-event-details-container');
+  if (!holder) {
+    holder = document.createElement('div');
+    holder.id = 'modal-event-details-container';
+    container.appendChild(holder);
+  }
+
+  const userId = state.user?.id || 'user';
+  const feedUrl = api.getCalendarFeedUrl(userId);
+  const webcalUrl = api.getWebcalFeedUrl(userId);
+  const icsDownloadUrl = api.getIcsExportUrl();
+
+  holder.innerHTML = `
+    <div class="modal-backdrop open">
+      <div class="modal-card" style="max-width: 640px; border-radius: var(--radius-xl); box-shadow: var(--shadow-float);">
+        <div class="modal-header" style="background: var(--bg-card); padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);">
+          <div>
+            <h3 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M19.5 3h-3V1.5H15V3H9V1.5H7.5V3h-3C3.67 3 3 3.67 3 4.5v15c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5v-15c0-.83-.67-1.5-1.5-1.5zm0 16.5h-15V8.5h15v11z"/><circle cx="8" cy="12" r="1.2" fill="#EA4335"/><circle cx="12" cy="12" r="1.2" fill="#FBBC05"/><circle cx="16" cy="12" r="1.2" fill="#34A853"/></svg>
+              Google Calendar & iCal Sync
+            </h3>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+              Sync your timetable with Google Calendar, iPhone / iPad, Apple Mac, or Outlook.
+            </p>
+          </div>
+          <button class="btn btn-ghost btn-icon modal-close" title="Close" style="font-size: 1.25rem;">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+          
+          <!-- Method 1: Live Feed URL -->
+          <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <strong style="font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                <span>📡</span> Option 1: Live Auto-Sync URL (Recommended)
+              </strong>
+              <span class="badge badge-purple" style="font-size: 0.72rem;">Always Up-to-Date</span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+              Subscribe to this live feed URL in your calendar app. Any new classes or rescheduled alarms in SmartTime AI will update automatically!
+            </p>
+
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+              <input type="text" id="modal-feed-url-input" class="form-control" value="${feedUrl}" readonly style="font-size: 0.82rem; background: var(--bg-card); cursor: pointer;" title="Click to copy">
+              <button type="button" id="modal-btn-copy-feed" class="btn btn-primary btn-sm" style="white-space: nowrap; font-weight: 700;">
+                📋 Copy Link
+              </button>
+            </div>
+
+            <!-- Expandable Instructions -->
+            <div style="background: var(--bg-card); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+              <div>🔹 <strong>Google Calendar Web:</strong> Click <strong>+</strong> next to <em>"Other calendars"</em> &rarr; choose <em>"From URL"</em> &rarr; Paste link.</div>
+              <div style="margin-top: 0.25rem;">🔹 <strong>iPhone / iPad:</strong> Go to <em>Settings &rarr; Calendar &rarr; Accounts &rarr; Add Account &rarr; Other &rarr; Add Subscribed Calendar</em> &rarr; Paste link.</div>
+            </div>
+          </div>
+
+          <!-- Method 2: Direct .ics File Download -->
+          <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem;">
+            <strong style="font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+              <span>📥</span> Option 2: Download .ics Calendar File
+            </strong>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+              Download a standard iCalendar (.ics) file and open it on your PC, Mac, or phone to instantly import all events.
+            </p>
+            <a href="${icsDownloadUrl}" download="smarttime_schedule.ics" class="btn btn-secondary btn-sm" style="font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span>💾</span> Download .ics File
+            </a>
+          </div>
+
+          <!-- Method 3: Google Account API Direct Push -->
+          <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem;" id="modal-gcal-api-box">
+            <strong style="font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+              <span>🔄</span> Option 3: Google Calendar Direct Cloud Sync
+            </strong>
+            <p id="modal-gcal-status-text" style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+              Connect your Google account to push classes directly into your Google Calendar account.
+            </p>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" id="modal-btn-connect-google" class="btn btn-outline btn-sm" style="font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M19.5 3h-3V1.5H15V3H9V1.5H7.5V3h-3C3.67 3 3 3.67 3 4.5v15c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5v-15c0-.83-.67-1.5-1.5-1.5zm0 16.5h-15V8.5h15v11z"/></svg>
+                Connect Google Account
+              </button>
+              <button type="button" id="modal-btn-sync-google" class="btn btn-primary btn-sm" style="display: none; font-weight: 700;">
+                ⚡ Sync Classes Now
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  `;
+
+  holder.querySelectorAll('.modal-close').forEach((btn) => {
+    btn.addEventListener('click', () => (holder.innerHTML = ''));
+  });
+
+  // Copy feed link
+  const copyBtn = holder.querySelector('#modal-btn-copy-feed');
+  const feedInput = holder.querySelector('#modal-feed-url-input');
+  const doCopy = () => {
+    navigator.clipboard?.writeText(feedUrl);
+    showToast('Calendar subscription link copied! 📋', 'success');
+  };
+  copyBtn?.addEventListener('click', doCopy);
+  feedInput?.addEventListener('click', doCopy);
+
+  // Check Google API Status
+  const statusText = holder.querySelector('#modal-gcal-status-text');
+  const connectBtn = holder.querySelector('#modal-btn-connect-google');
+  const syncBtn = holder.querySelector('#modal-btn-sync-google');
+
+  api.getGoogleSyncStatus().then((status) => {
+    if (status.connected) {
+      if (statusText) statusText.innerHTML = `🟢 Connected as <strong>${status.email || 'Google User'}</strong>`;
+      if (connectBtn) connectBtn.style.display = 'none';
+      if (syncBtn) syncBtn.style.display = 'inline-flex';
+    }
+  }).catch(() => {});
+
+  connectBtn?.addEventListener('click', async () => {
+    try {
+      const res = await api.getGoogleAuthUrl();
+      if (res.url) {
+        window.location.href = res.url;
+      }
+    } catch (err) {
+      showToast(err.message || 'Google OAuth credentials not configured in .env. You can use Option 1 (Live Auto-Sync URL) which works instantly!', 'info');
+    }
+  });
+
+  syncBtn?.addEventListener('click', async () => {
+    syncBtn.disabled = true;
+    syncBtn.textContent = '⏳ Syncing...';
+    try {
+      const res = await api.syncGoogleCalendar();
+      showToast(res.message || `Synced ${res.synced || 0} classes to Google Calendar!`, 'success');
+      holder.innerHTML = '';
+    } catch (err) {
+      showToast('Sync error: ' + err.message, 'error');
+    } finally {
+      syncBtn.disabled = false;
+      syncBtn.textContent = '⚡ Sync Classes Now';
     }
   });
 }

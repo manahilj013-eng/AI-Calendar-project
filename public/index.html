@@ -49,9 +49,9 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=1.0.9')
+        navigator.serviceWorker.register('./sw.js?v=1.1.0')
           .then((reg) => {
-            console.log('📱 Service Worker registered (v1.0.9) with scope:', reg.scope);
+            console.log('📱 Service Worker registered (v1.1.0) with scope:', reg.scope);
             reg.update();
           })
           .catch((err) => console.warn('SW registration failed:', err));
@@ -60,6 +60,6 @@
   </script>
 
   <!-- Main ES Module Entry Point with cache buster -->
-  <script type="module" src="./js/app.js?v=1.0.9"></script>
+  <script type="module" src="./js/app.js?v=1.1.0"></script>
 </body>
 </html>

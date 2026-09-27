@@ -33,6 +33,8 @@ app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/timetables', require('./routes/timetableRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/calendar', require('./routes/calendarSyncRoutes'));
+app.use('/api/integrations', require('./routes/calendarSyncRoutes'));
 
 const db = require('./database/db');
 

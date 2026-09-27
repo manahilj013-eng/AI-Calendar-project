@@ -5,4 +5,7 @@ local_downloads
 # Environment & Dependencies
 node_modules/
 .env
+.bin/
 uploads/
+*.zip
+*.tmp.*

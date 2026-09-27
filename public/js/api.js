@@ -588,6 +588,15 @@ function handleClientDB(endpoint, options = {}) {
     return { success: true, events, count: events.length };
   }
 
+  if (path.startsWith('/api/integrations/google/status')) {
+    return {
+      configured: false,
+      connected: false,
+      feed_url: `${window.location.origin}/api/calendar/feed/${state.user?.id || 'demo'}.ics`,
+      webcal_url: `webcal://${window.location.host}/api/calendar/feed/${state.user?.id || 'demo'}.ics`
+    };
+  }
+
   return { success: true };
 }
 
@@ -699,5 +708,15 @@ export const api = {
   getSettings: () => request('/api/notifications/settings'),
   updateSettings: (body) => request('/api/notifications/settings', { method: 'PUT', body: JSON.stringify(body) }),
   testChime: () => request('/api/notifications/test-chime', { method: 'POST' }),
-  triggerAlarm: () => request('/api/notifications/trigger-alarm', { method: 'POST' })
+  triggerAlarm: () => request('/api/notifications/trigger-alarm', { method: 'POST' }),
+
+  // Google Calendar & iCal Integrations
+  getGoogleSyncStatus: () => request('/api/integrations/google/status'),
+  getGoogleAuthUrl: () => request('/api/integrations/google/auth-url'),
+  syncGoogleCalendar: () => request('/api/integrations/google/sync-all', { method: 'POST' }),
+  disconnectGoogleCalendar: () => request('/api/integrations/google/disconnect', { method: 'POST' }),
+  getIcsExportUrl: () => `/api/calendar/export/ics`,
+  getCalendarFeedUrl: (userId) => `${window.location.origin}/api/calendar/feed/${userId || (state.user && state.user.id) || 'schedule'}.ics`,
+  getWebcalFeedUrl: (userId) => `webcal://${window.location.host}/api/calendar/feed/${userId || (state.user && state.user.id) || 'schedule'}.ics`,
+  getEventGoogleLink: (eventId) => request(`/api/calendar/google-link/${eventId}`)
 };
